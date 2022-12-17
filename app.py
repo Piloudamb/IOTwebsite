@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, Response
+import cv2
 
 # init app
 app = Flask(__name__)
@@ -23,5 +24,22 @@ def index():
 
 	return render_template("graph.html", labels = dates, values = counting)
 
+# Route
+@app.route('/test')
+def video_feed():
+    return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+def gen():
+    camera = cv2.VideoCapture('http://192.168.234.16:8090/?action=stream')
+    
+    while True:
+        ret, img = camera.read()
+
+        if ret:
+            frame = cv2.imencode('.jpg', img)[1].tobytes()
+            yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        else:
+            break
+
 if __name__ == '__main__':
-	app.run(debug=True)
+    app.run(debug=True)
