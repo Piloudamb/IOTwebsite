@@ -25,7 +25,7 @@ def index():
 	return render_template("graph.html", labels = dates, values = counting)
 
 # Route
-@app.route('/test')
+@app.route('/live')
 def video_feed():
     return Response(gen(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
